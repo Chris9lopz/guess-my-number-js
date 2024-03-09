@@ -5,6 +5,7 @@
 
 // Random number
 const randomNumber = Math.floor(Math.random() * 20) + 1;
+// Define a global highscore
 let globalHighscore = 0;
 console.log(randomNumber); // Testing
 // Create an event of check button
@@ -29,6 +30,7 @@ document.querySelector('.check').addEventListener('click', () => {
       document.querySelector('.message').textContent = '✅ Correct!';
       document.querySelector('.highscore').textContent = actualScore;
     } else {
+      // Add logic: Add the message of failure, reduce the number of the score.
       document.querySelector('.message').textContent = '❌ Incorrect, keep trying!';
       globalHighscore = document.querySelector('.score').textContent = actualScore - 1;
       if (globalHighscore === 0) {
