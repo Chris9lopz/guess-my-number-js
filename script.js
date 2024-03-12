@@ -1,43 +1,72 @@
 'use strict';
 
-// 1. Generate a random number to guess
-// 2. Create an event that start the logic of the program
-
 // Random number
 const randomNumber = Math.floor(Math.random() * 20) + 1;
 // Define a global highscore
 let globalHighscore = 0;
-console.log(randomNumber); // Testing
+
+// DOM elements
+const scoreElement = document.querySelector('.score');
+const messageElement = document.querySelector('.message');
+const highscoreElement = document.querySelector('.highscore');
+const numberElement = document.querySelector('.number');
+const bodyElement = document.querySelector('body');
+const againElement = document.querySelector('.again');
+
+// Define the previously highscore
+let highscore = sessionStorage.getItem('highscore');
+if (highscore === null) {
+  highscoreElement.textContent = '0';
+} else {
+  highscoreElement.textContent = highscore;
+}
 // Create an event of check button
 document.querySelector('.check').addEventListener('click', () => {
   // Save the number fill by the user
   const guessNumber = Number(document.querySelector('.guess').value);
   // Retrieve the actual score
-  let actualScore = Number(document.querySelector('.score').textContent);
+  let actualScore = Number(scoreElement.textContent);
+
   // Validate if a number is introduce by the user
-  if(!guessNumber){
-    document.querySelector('.message').textContent = '❌ Not a number';
-    globalHighscore = document.querySelector('.score').textContent = actualScore - 1;
-  } else if (guessNumber < 1 || guessNumber > 20) {
-    document.querySelector('.message').textContent = '❌ Number out of range, try again!';
-    globalHighscore = document.querySelector('.score').textContent = actualScore - 1;
+  if (!guessNumber || guessNumber < 1 || guessNumber > 20) {
+    messageElement.textContent = '❌ Invalid input, try again!';
+    // Check the score if is greater than 0
+    if (actualScore > 1) {
+      scoreElement.textContent = actualScore - 1;
+    } else {
+      scoreElement.textContent = '0';
+      messageElement.textContent = '😫 Sorry, you lose the game, try again!';
+    }
   } else {
     // Validate if the random number and guess number are equals
-    if(guessNumber === randomNumber){
+    if (guessNumber === randomNumber) {
       // Add logic: change message clase, add number, and change background color
-      document.querySelector('body').classList.add('correct-guess');
-      document.querySelector('.number').textContent = guessNumber;
-      document.querySelector('.message').textContent = '✅ Correct!';
-      document.querySelector('.highscore').textContent = actualScore;
+      bodyElement.classList.add('correct-guess');
+      numberElement.textContent = guessNumber;
+      messageElement.textContent = '✅ Correct!';
+      // Set the new highscore in session storage
+      if (actualScore > globalHighscore) {
+        globalHighscore = actualScore;
+        if(globalHighscore > highscore) {
+          sessionStorage.setItem('highscore', globalHighscore);
+          highscoreElement.textContent = globalHighscore; 
+        } 
+      }
     } else {
-      // Add logic: Add the message of failure, reduce the number of the score.
-      document.querySelector('.message').textContent = '❌ Incorrect, keep trying!';
-      globalHighscore = document.querySelector('.score').textContent = actualScore - 1;
-      if (globalHighscore === 0) {
-        document.querySelector('.message').textContent = '❌ Sorry, you lose.';
+      // Add logic: Add the message of failure, reduce the number of the score. 
+      messageElement.textContent = guessNumber > randomNumber ? '❌ Incorrect, number too high!' : '❌ Incorrect, number too low!';
+      // Check the score if is greater than 0
+      if (actualScore > 1) {
+        scoreElement.textContent = actualScore - 1;
+      } else {
+        scoreElement.textContent = '0';
+        messageElement.textContent = '😫 Sorry, you lose the game, try again!';
       }
     }
   }
 });
 
-console.log(globalHighscore);
+// Create an event when again button is clicked
+againElement.addEventListener('click', () => {
+  location.reload();
+});
